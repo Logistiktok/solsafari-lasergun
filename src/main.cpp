@@ -2,18 +2,18 @@
 #include <IRLibDecodeBase.h>  
 #include <IRLibSendBase.h>    
 #include <IRLib_P01_NEC.h>    
-#include <IRLib_P02_Sony.h>   
+#include <IRLib_P03_RC5.h>   
 #include <IRLibCombo.h>   
 #include <Arduino.h>
 
 #define GUN_INPUT 4
 
-#define DELAY_BETWEEN_SHOTS 100 // in ms
+#define DELAY_BETWEEN_SHOTS 200 // in ms
 
 boolean isReadyToShoot = true;
 unsigned long timestamp = 0;
 
-IRsend mySender;
+IRsendRC5 mySender;
  
 void setup() {
   pinMode(GUN_INPUT, INPUT_PULLUP);
@@ -25,7 +25,7 @@ void loop() {
     boolean button_state = digitalRead(GUN_INPUT);
   
     if(!button_state && isReadyToShoot) {
-      mySender.send(SONY,0xa8bca, 10);
+      mySender.send(0x7f9d);
       isReadyToShoot = false;
       timestamp = millis();
 
