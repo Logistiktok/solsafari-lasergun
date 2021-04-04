@@ -63,12 +63,10 @@ void updateLights() {
 }
 
 void loop() {
-    //send a code every time a character is received from the serial port
-    //Sony DVD power A8BCA
     boolean button_state = digitalRead(GUN_INPUT);
   
     if(!button_state && isReadyToShoot) {
-      mySender.send(0x7f9d);
+      mySender.send(0x7f9d); //Send IR command through RC5
       isReadyToShoot = false;
       timestamp = millis();
      } 
@@ -77,6 +75,5 @@ void loop() {
        isReadyToShoot = true;
      }
 
-     updateLights();
-     
+     updateLights();    
 }
