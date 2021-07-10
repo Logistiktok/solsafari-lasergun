@@ -31,7 +31,6 @@ IRsendRC5 mySender;
  
 
  void resetLEDs() {
-    pinMode(GUN_INPUT_NEGATIVE_PIN, INPUT_PULLUP);
     digitalWrite(LED_1, LOW);
     digitalWrite(LED_2, LOW);
     digitalWrite(LED_3, LOW);
@@ -48,21 +47,23 @@ void bootUpSoundBatch1(){
     delay(BOOT_DELAY);
   }
   resetLEDs();
+  pinMode(GUN_INPUT_NEGATIVE_PIN, INPUT_PULLUP);
 }
 
 void bootUpSoundBatch2(){
-    pinMode(GUN_INPUT_NEGATIVE_PIN, OUTPUT);
+    pinMode(GUN_INPUT_POSITIVE_PIN, OUTPUT);
   for (byte i = 0; i < 5; i++){
     for (int pin : pins) { 
       boolean state = digitalRead(pin);
       digitalWrite(pin, !state);
     }
-      digitalWrite(GUN_INPUT_NEGATIVE_PIN, LOW);
-      delay(100);
-      digitalWrite(GUN_INPUT_NEGATIVE_PIN, INPUT_PULLUP);
+      digitalWrite(GUN_INPUT_POSITIVE_PIN, HIGH);
+      delay(50);
+      digitalWrite(GUN_INPUT_POSITIVE_PIN, LOW);
       delay(BOOT_DELAY);
   }
   resetLEDs();
+  pinMode(GUN_INPUT_POSITIVE_PIN, INPUT);
 }
 
 void setup() {
@@ -112,15 +113,20 @@ void updateLights() {
 }
 
 boolean button_down(){
+  if(isBatch2) {
+    boolean button_state = digitalRead(GUN_INPUT_POSITIVE_PIN); // if high = button down
+    return button_state;
 
+  } else { // must be first batch
+    boolean button_state = digitalRead(GUN_INPUT_NEGATIVE_PIN); // if low = button down
+    return !button_state; //flip because button up = down
+  }
 }
 
 void loop() {
-    boolean button_state = digitalRead(GUN_INPUT_NEGATIVE_PIN);
-    boolean button_state_test = digitalRead(GUN_INPUT_POSITIVE_PIN);
-    digitalWrite(LED_BUILTIN_RX, button_state_test);
+  boolean button_state = button_down();
   
-    if(!button_state && isReadyToShoot) {
+    if(button_state && isReadyToShoot) {
       mySender.send(0x7f9d); //Send IR command through RC5
       isReadyToShoot = false;
       timestamp = millis();
