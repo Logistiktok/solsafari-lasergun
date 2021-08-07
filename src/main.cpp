@@ -15,10 +15,12 @@
 #define LED_4 10
 
 #define BOOT_DELAY 500
-
-
 #define DELAY_BETWEEN_SHOTS 200 // in ms
 #define DELAY_BETWEEN_LIGHTS 50
+
+//#define IR_CODE 0x7f9d //blå og gul
+#define IR_CODE 0x7f9F // orange og grøn
+
 
 int pins[] = {LED_1, LED_2, LED_3, LED_4};
 
@@ -127,12 +129,12 @@ void loop() {
   boolean button_state = button_down();
   
     if(button_state && isReadyToShoot) {
-      mySender.send(0x7f9d); //Send IR command through RC5
+      mySender.send(IR_CODE); //Send IR command through RC5
       isReadyToShoot = false;
       timestamp = millis();
      } 
      
-     if ((millis() - timestamp) > DELAY_BETWEEN_SHOTS && button_state) {
+     if ((millis() - timestamp) > DELAY_BETWEEN_SHOTS && !button_state) {
        isReadyToShoot = true;
      }
 
